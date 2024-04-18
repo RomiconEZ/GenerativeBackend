@@ -117,6 +117,9 @@ LangChain используется для обработки и управлен
    docker compose up
    ```
 
+### Additionally
+* http://127.0.0.1:8000/ - FastAPI документация
+* http://127.0.0.1:5050/ - PgAdmin
 
 <!-- LICENSE -->
 ## License

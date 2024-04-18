@@ -1,3 +1,4 @@
+import os
 from typing import Any, Dict
 from typing import Annotated
 
@@ -12,8 +13,8 @@ from ...schemas.job import Job
 from ...core.db.database import async_get_db
 from fastapi import APIRouter
 from fastapi.responses import FileResponse
-from fastapi import HTTPException, status
-
+from fastapi import HTTPException
+from fastapi import BackgroundTasks
 
 from ...crud.crud_customer import crud_customers
 from ...crud.crud_agent import crud_agents
@@ -109,17 +110,21 @@ async def get_task_for_answer_generation(task_id: str) -> str:
             return job_info.result['history'][-1]["content"]
         except FileNotFoundError:
             raise HTTPException(
-                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                        detail="Request understood but cannot be processed due to logical errors."
-                        )
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Request understood but cannot be processed due to logical errors."
+            )
     else:
         raise HTTPException(status_code=404, detail="Task not completed or failed.")
 
     return vars(job_info)
 
 
+def remove_file(path):
+    os.remove(path)
+
+
 @router.get("/audio_generation/{task_id}")
-async def get_task_for_audio_generation(task_id: str) -> FileResponse:
+async def get_task_for_audio_generation(task_id: str, background_tasks: BackgroundTasks) -> FileResponse:
     """Get information about a specific background task and return the generated audio file if available.
 
     Parameters:
@@ -134,7 +139,10 @@ async def get_task_for_audio_generation(task_id: str) -> FileResponse:
     job_info = await job.info()
 
     if getattr(job_info, 'success', False):
+
         path_to_gen_audio = job_info.result
+        # Добавление задачи на удаление файла после отправки ответа, передаем путь к файлу в функцию
+        background_tasks.add_task(remove_file, path_to_gen_audio)
         try:
             return FileResponse(path_to_gen_audio, media_type="audio/ogg", filename="generated_audio.ogg")
         except FileNotFoundError:
