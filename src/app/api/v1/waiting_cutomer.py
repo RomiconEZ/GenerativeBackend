@@ -1,21 +1,21 @@
-from typing import Annotated, Any, Dict
+from typing import Annotated, Any, Dict, List
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Request, Depends, Response, status
 from icecream import ic
 from sqlalchemy.ext.asyncio import AsyncSession
 from arq.jobs import Job as ArqJob
+from starlette.responses import Response
 
 from ..dependencies import check_current_customer_else_create
 from ...core.utils import queue
 import asyncio
 
 from ...core.db.database import async_get_db
-from ...core.exceptions.http_exceptions import DuplicateValueException, NotFoundException
+from ...core.exceptions.http_exceptions import NotFoundException
 from ...crud.crud_agent import crud_agents
-from ...crud.crud_customer import crud_customers
 
 from ...crud.crud_waiting_customers import crud_waiting_customers
-from ...schemas.customer import CustomerCreate, CustomerCreateInternal, CustomerRead
+from ...schemas.customer import CustomerCreate
 
 from ...schemas.waiting_customers import WaitingCustomersRead, WaitingCustomersCreateInternal, \
     WaitingCustomersUpdate
@@ -31,8 +31,8 @@ async def add_waiting_customer(
         request: Request,
         customer: CustomerCreate,
         db: Annotated[AsyncSession, Depends(async_get_db)],
-        context: Dict[str, Any] = None,
-) -> WaitingCustomersRead:
+        context: List[Dict[str, str]] = None,
+) -> Response | WaitingCustomersRead:
     await check_current_customer_else_create(customer, db)
 
     waiting_customer_id = await crud_waiting_customers.get(db=db,
@@ -40,9 +40,9 @@ async def add_waiting_customer(
                                                            customer_id=customer.id)
 
     if waiting_customer_id is not None:
-        raise DuplicateValueException("Waiting customer already exists")
+        return Response(status_code=status.HTTP_409_CONFLICT, content="Waiting customer already exists")
 
-    if context is None or context == {}:
+    if context is None or context == []:
         summary = NO_SUMMARY_TEXT
     else:
 

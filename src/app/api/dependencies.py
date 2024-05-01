@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException, Request
 from fastcrud.exceptions.http_exceptions import NotFoundException
+from icecream import ic
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..core.config import settings
@@ -74,8 +75,8 @@ async def rate_limiter(
     user = await get_current_customer(customer_id=customer_id, db=db)
     path = sanitize_path(request.url.path)
     if user:
-        user_id = user.id
-        tier = await crud_tiers.get(db, id=user.tier_id)
+        user_id = user["id"]
+        tier = await crud_tiers.get(db, id=user["tier_id"])
         if tier:
             rate_limit = await crud_rate_limits.get(db=db, tier_id=tier["id"], path=path)
             if rate_limit:
