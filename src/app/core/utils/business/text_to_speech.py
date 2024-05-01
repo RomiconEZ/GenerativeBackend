@@ -3,12 +3,10 @@ import re
 import subprocess
 from pathlib import Path
 
-import soundfile as sf
-import torch
 from icecream import ic
 from langdetect import detect
 
-from ..ML_Assets.core_object import DEVICE
+from ...config import settings
 
 
 def detect_language(text):
@@ -32,7 +30,7 @@ def filter_text(text):
 
 def synthesize_speech_piper(text, model_path, output_file):
     parent_path = Path(__file__).parent
-    piper_executable = parent_path / "local_lib" / "piper_arm64" / "piper"
+    piper_executable = parent_path / "local_lib" / f"piper_{settings.PROCESSOR_ARCHITECTURES}" / "piper"
 
     if not piper_executable.exists():
         raise FileNotFoundError("Piper executable not found at the expected location.")
@@ -66,7 +64,7 @@ async def text2audio(text, audiofile_name):
     parent_path = Path(__file__).parent
     if language == "ru":
         local_model_file = (
-            parent_path / "local_model" / "ru_piper_voice" / "ru_RU-irina-medium.onnx"
+                parent_path / "local_model" / "ru_piper_voice" / "ru_RU-irina-medium.onnx"
         )
         if not local_model_file.exists():
             raise FileNotFoundError(
@@ -74,7 +72,7 @@ async def text2audio(text, audiofile_name):
             )
     else:
         local_model_file = (
-            parent_path / "local_model" / "en_piper_voice" / "en_US-libritts_r-medium.onnx"
+                parent_path / "local_model" / "en_piper_voice" / "en_US-libritts_r-medium.onnx"
         )
         if not local_model_file.exists():
             raise FileNotFoundError(
@@ -88,82 +86,5 @@ async def text2audio(text, audiofile_name):
     )
 
     synthesize_speech_piper(text, local_model_file, audiofile_path)
-
-    return audiofile_path
-
-
-# ------------- Альтернативные варианты генерации звуковых дорожек ------------------
-async def textfile2audio_silero(textfile_name, audiofile_name):
-    """
-    Convert text in textfile to audio file
-
-    Parameters:
-        textfile (str): path of text file (.txt)
-        audiofile (str): path of audio file to save (.wav)
-
-    """
-    temporary_customer_files_dir_parent = Path(__file__).parent.parent.parent.parent
-    textfile_path = str(
-        temporary_customer_files_dir_parent
-        / f"temporary_customer_files/text_files/{textfile_name}.pdf"
-    )
-    audiofile_path = str(
-        temporary_customer_files_dir_parent
-        / f"temporary_customer_files/audio_files/{audiofile_name}.ogg"
-    )
-
-    if os.path.exists(textfile_path) is False:
-        return
-    try:
-        with open(textfile_path, "r") as file:
-            text = file.read()
-        audiofile = text2audio_silero(text, audiofile_path)
-        return audiofile
-    except Exception as e:
-        pass
-
-
-async def text2audio_silero(text, audiofile_name):
-    """
-    Convert text to audio file
-
-    Parameters:
-        text (str)
-        audiofile_name (str): name of audio file
-
-    """
-
-    language = detect_language(text)
-
-    parent_path = Path(__file__).parent
-    if language == "en":
-        return None
-    else:
-        local_file = parent_path / "local_model" / "model_silero_ru.pt"
-        speaker = "aidar"
-        put_accent = True
-        put_yo = True
-
-    model = torch.package.PackageImporter(local_file).load_pickle("tts_models", "model")
-
-    model.to(DEVICE)
-
-    sample_rate = 48000
-
-    audio = model.apply_tts(
-        text=text,
-        speaker=speaker,
-        sample_rate=sample_rate,
-        put_accent=put_accent,
-        put_yo=put_yo,
-    )
-
-    temporary_customer_files_dir_parent = Path(__file__).parent.parent.parent.parent
-    audiofile_path = str(
-        temporary_customer_files_dir_parent
-        / f"temporary_customer_files/audio_files/{audiofile_name}.ogg"
-    )
-
-    sf.write(audiofile_path, audio, sample_rate)
 
     return audiofile_path

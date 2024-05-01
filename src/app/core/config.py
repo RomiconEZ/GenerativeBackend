@@ -121,6 +121,7 @@ class BusinessSettings(BaseSettings):
     INT_MAX_REVIEWS: int = config("INT_MAX_REVIEWS", default=1000000)
     INT_MAX_TOUR: int = config("INT_MAX_TOUR", default=10000000)
     INT_MAX_AGENTS: int = config("INT_MAX_AGENTS", default=1000)
+    PROCESSOR_ARCHITECTURES: str = config("PROCESSOR_ARCHITECTURES", default="arm64")
 
 
 class EnvironmentSettings(BaseSettings):
