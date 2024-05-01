@@ -1,11 +1,12 @@
 import os
+
 import speech_recognition as sr
 import whisper
 
-#from ....main import MODEL_WHISPER
+# from ....main import MODEL_WHISPER
 
 
-#MODEL_WHISPER = whisper.load_model("medium")
+# MODEL_WHISPER = whisper.load_model("medium")
 # def audio2text(audiofile, textfile):
 #     """
 #     Convert audio to text file
@@ -36,4 +37,4 @@ import whisper
 #
 #     return textfile
 
-#audio2text("/Users/roman/PycharmProjects/GenBackend/src/app/core/utils/business/test_en.wav","text.txt")
+# audio2text("/Users/roman/PycharmProjects/GenBackend/src/app/core/utils/business/test_en.wav","text.txt")

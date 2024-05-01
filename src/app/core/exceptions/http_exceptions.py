@@ -1,11 +1,11 @@
 # ruff: noqa
 from fastcrud.exceptions.http_exceptions import (
-    CustomException,
     BadRequestException,
-    NotFoundException,
+    CustomException,
+    DuplicateValueException,
     ForbiddenException,
+    NotFoundException,
+    RateLimitException,
     UnauthorizedException,
     UnprocessableEntityException,
-    DuplicateValueException,
-    RateLimitException,
 )

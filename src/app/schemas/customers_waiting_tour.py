@@ -11,7 +11,9 @@ class CustomersWaitingTourBase(BaseModel):
     tour_id: int
 
 
-class CustomersWaitingTour(TimestampSchema, CustomersWaitingTourBase, UUIDSchema, PersistentDeletion):
+class CustomersWaitingTour(
+    TimestampSchema, CustomersWaitingTourBase, UUIDSchema, PersistentDeletion
+):
     pass
 
 

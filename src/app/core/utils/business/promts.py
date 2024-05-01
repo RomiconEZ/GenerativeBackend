@@ -17,4 +17,3 @@ Ensure the summary is clear and to the point, capturing the essence of the excha
 Example of a good summary:
 'The user asked the assistant how they were, to which the assistant responded positively and inquired how they could assist the user further. The interaction was polite and focused on understanding the user's needs.'
 Actual conversation to summarize: """
-

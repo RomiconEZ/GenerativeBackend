@@ -7,7 +7,10 @@ from ..core.schemas import PersistentDeletion, TimestampSchema, UUIDSchema
 
 
 class ReviewBase(BaseModel):
-    text: Annotated[str, Field(min_length=1, max_length=63206, examples=["This is the content of my review."])]
+    text: Annotated[
+        str,
+        Field(min_length=1, max_length=63206, examples=["This is the content of my review."]),
+    ]
     created_by_customer_id: int
 
 
@@ -17,7 +20,10 @@ class Review(TimestampSchema, ReviewBase, UUIDSchema, PersistentDeletion):
 
 class ReviewRead(BaseModel):
     id: int
-    text: Annotated[str, Field(min_length=1, max_length=63206, examples=["This is the content of my review."])]
+    text: Annotated[
+        str,
+        Field(min_length=1, max_length=63206, examples=["This is the content of my review."]),
+    ]
 
     created_by_customer_id: int
     created_at: datetime
@@ -36,7 +42,12 @@ class ReviewUpdate(BaseModel):
 
     text: Annotated[
         str | None,
-        Field(min_length=1, max_length=63206, examples=["This is the updated content of my Review."], default=None),
+        Field(
+            min_length=1,
+            max_length=63206,
+            examples=["This is the updated content of my Review."],
+            default=None,
+        ),
     ]
 
 

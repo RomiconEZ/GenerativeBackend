@@ -1,26 +1,31 @@
+from io import BytesIO
 from typing import Annotated
+
+import pandas as pd
+from fastapi import APIRouter, Depends
+from fastapi.responses import StreamingResponse
+from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.requests import Request
 
 from ...api.dependencies import get_current_superagent
 from ...core.config import settings
 from ...core.db.database import async_get_db
-from ...core.exceptions.http_exceptions import DuplicateValueException, NotFoundException
+from ...core.exceptions.http_exceptions import (
+    DuplicateValueException,
+    NotFoundException,
+)
 from ...crud.crud_agent import crud_agents
-from ...schemas.agent import AgentRead, AgentCreate, AgentCreateInternal, AgentUpdate
-from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from starlette.requests import Request
-from io import BytesIO
-import pandas as pd
-from fastapi.responses import StreamingResponse
+from ...schemas.agent import AgentCreate, AgentCreateInternal, AgentRead, AgentUpdate
 
 router = APIRouter(tags=["agent"])
 
 
-@router.post("/agent", response_model=AgentRead,
-             status_code=201)
+@router.post("/agent", response_model=AgentRead, status_code=201)
 async def write_agent(
-        request: Request, self_agent_id: int,
-        new_agent: AgentCreate, db: Annotated[AsyncSession, Depends(async_get_db)]
+    request: Request,
+    self_agent_id: int,
+    new_agent: AgentCreate,
+    db: Annotated[AsyncSession, Depends(async_get_db)],
 ) -> AgentRead:
     await get_current_superagent(self_agent_id, db)
 
@@ -36,10 +41,10 @@ async def write_agent(
 
 @router.patch("/agent/{updated_agent_id}")
 async def update_tour(
-        request: Request,
-        updated_agent_id: int,
-        updated_agent: AgentUpdate,
-        db: Annotated[AsyncSession, Depends(async_get_db)],
+    request: Request,
+    updated_agent_id: int,
+    updated_agent: AgentUpdate,
+    db: Annotated[AsyncSession, Depends(async_get_db)],
 ) -> dict[str, str]:
     db_agent_id = await crud_agents.get(db=db, schema_to_select=AgentRead, id=updated_agent_id)
     if db_agent_id is None:
@@ -51,7 +56,7 @@ async def update_tour(
 
 @router.get("/agents", response_class=StreamingResponse)
 async def get_all_agents(
-        request: Request, self_agent_id: int, db: Annotated[AsyncSession, Depends(async_get_db)]
+    request: Request, self_agent_id: int, db: Annotated[AsyncSession, Depends(async_get_db)]
 ):
     # Проверка прав текущего пользователя
     await get_current_superagent(self_agent_id, db)
@@ -63,15 +68,15 @@ async def get_all_agents(
         limit=settings.INT_MAX_AGENTS,
         schema_to_select=AgentRead,
         return_as_model=True,  # Убедитесь, что данные возвращаются как модели Pydantic
-        is_deleted=False
+        is_deleted=False,
     )
 
     # Конвертация данных в DataFrame
-    df = pd.DataFrame([agent.dict() for agent in agents_data['data']])
+    df = pd.DataFrame([agent.dict() for agent in agents_data["data"]])
 
     # Сохранение DataFrame в Excel
     output = BytesIO()
-    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+    with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
         df.to_excel(writer, index=False)
     output.seek(0)
 
@@ -79,17 +84,17 @@ async def get_all_agents(
     response = StreamingResponse(
         output,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": "attachment; filename=agents.xlsx"}
+        headers={"Content-Disposition": "attachment; filename=agents.xlsx"},
     )
     return response
 
 
 @router.delete("/agent/{delete_agent_id}")
 async def erase_db_agent(
-        request: Request,
-        self_agent_id: int,
-        delete_agent_id: int,
-        db: Annotated[AsyncSession, Depends(async_get_db)],
+    request: Request,
+    self_agent_id: int,
+    delete_agent_id: int,
+    db: Annotated[AsyncSession, Depends(async_get_db)],
 ) -> dict[str, str]:
     await get_current_superagent(self_agent_id, db)
 

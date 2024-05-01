@@ -8,13 +8,21 @@ from ..core.schemas import PersistentDeletion, TimestampSchema, UUIDSchema
 
 class CustomerBase(BaseModel):
     id: int
-    name: Annotated[str | None, Field(min_length=1, max_length=30, examples=["Name"], default=None)]
-    surname: Annotated[str | None, Field(min_length=1, max_length=50, examples=["Surname"], default=None)]
-    patronymic: Annotated[str | None, Field(min_length=1, max_length=40, examples=["Patronymic"], default=None)]
+    name: Annotated[
+        str | None, Field(min_length=1, max_length=30, examples=["Name"], default=None)
+    ]
+    surname: Annotated[
+        str | None, Field(min_length=1, max_length=50, examples=["Surname"], default=None)
+    ]
+    patronymic: Annotated[
+        str | None, Field(min_length=1, max_length=40, examples=["Patronymic"], default=None)
+    ]
 
     username_telegram: Annotated[str, Field(min_length=1, max_length=60, examples=["tg_name"])]
 
-    email: Annotated[EmailStr | None, Field(examples=["customer.customer@example.com"], default=None)]
+    email: Annotated[
+        EmailStr | None, Field(examples=["customer.customer@example.com"], default=None)
+    ]
 
 
 class Customer(TimestampSchema, CustomerBase, UUIDSchema, PersistentDeletion):
@@ -36,13 +44,23 @@ class CustomerCreateInternal(CustomerCreate):
 class CustomerUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    name: Annotated[str | None, Field(min_length=1, max_length=30, examples=["Name"], default=None)]
-    surname: Annotated[str | None, Field(min_length=1, max_length=50, examples=["Surname"], default=None)]
-    patronymic: Annotated[str | None, Field(min_length=1, max_length=40, examples=["Patronymic"], default=None)]
+    name: Annotated[
+        str | None, Field(min_length=1, max_length=30, examples=["Name"], default=None)
+    ]
+    surname: Annotated[
+        str | None, Field(min_length=1, max_length=50, examples=["Surname"], default=None)
+    ]
+    patronymic: Annotated[
+        str | None, Field(min_length=1, max_length=40, examples=["Patronymic"], default=None)
+    ]
 
-    username_telegram: Annotated[str | None, Field(min_length=1, max_length=60, examples=["tg_name"], default=None)]
+    username_telegram: Annotated[
+        str | None, Field(min_length=1, max_length=60, examples=["tg_name"], default=None)
+    ]
 
-    email: Annotated[EmailStr | None, Field(examples=["customer.customer@example.com"], default=None)]
+    email: Annotated[
+        EmailStr | None, Field(examples=["customer.customer@example.com"], default=None)
+    ]
 
 
 class CustomerUpdateInternal(CustomerUpdate):

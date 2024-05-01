@@ -8,13 +8,23 @@ from ..core.schemas import PersistentDeletion, TimestampSchema, UUIDSchema
 
 class AgentBase(BaseModel):
     id: int
-    name: Annotated[str | None, Field(min_length=1, max_length=30, examples=["Name"], default=None)]
-    surname: Annotated[str | None, Field(min_length=1, max_length=50, examples=["Surname"], default=None)]
-    patronymic: Annotated[str | None, Field(min_length=1, max_length=40, examples=["Patronymic"], default=None)]
+    name: Annotated[
+        str | None, Field(min_length=1, max_length=30, examples=["Name"], default=None)
+    ]
+    surname: Annotated[
+        str | None, Field(min_length=1, max_length=50, examples=["Surname"], default=None)
+    ]
+    patronymic: Annotated[
+        str | None, Field(min_length=1, max_length=40, examples=["Patronymic"], default=None)
+    ]
 
-    username_telegram: Annotated[str, Field(min_length=1, max_length=60, examples=["tg_name"], default=None)]
+    username_telegram: Annotated[
+        str, Field(min_length=1, max_length=60, examples=["tg_name"], default=None)
+    ]
 
-    email: Annotated[EmailStr | None, Field(examples=["agent.agent@example.com"], default=None)]
+    email: Annotated[
+        EmailStr | None, Field(examples=["agent.agent@example.com"], default=None)
+    ]
 
 
 class Agent(TimestampSchema, AgentBase, UUIDSchema, PersistentDeletion):
@@ -38,13 +48,23 @@ class AgentCreateInternal(AgentCreate):
 class AgentUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    name: Annotated[str | None, Field(min_length=1, max_length=30, examples=["Name"], default=None)]
-    surname: Annotated[str | None, Field(min_length=1, max_length=50, examples=["Surname"], default=None)]
-    patronymic: Annotated[str | None, Field(min_length=1, max_length=40, examples=["Patronymic"], default=None)]
+    name: Annotated[
+        str | None, Field(min_length=1, max_length=30, examples=["Name"], default=None)
+    ]
+    surname: Annotated[
+        str | None, Field(min_length=1, max_length=50, examples=["Surname"], default=None)
+    ]
+    patronymic: Annotated[
+        str | None, Field(min_length=1, max_length=40, examples=["Patronymic"], default=None)
+    ]
 
-    username_telegram: Annotated[str | None, Field(min_length=1, max_length=60, examples=["tg_name"], default=None)]
+    username_telegram: Annotated[
+        str | None, Field(min_length=1, max_length=60, examples=["tg_name"], default=None)
+    ]
 
-    email: Annotated[EmailStr | None, Field(examples=["agent.agent@example.com"], default=None)]
+    email: Annotated[
+        EmailStr | None, Field(examples=["agent.agent@example.com"], default=None)
+    ]
 
 
 class AgentUpdateInternal(AgentUpdate):

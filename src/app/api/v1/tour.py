@@ -1,26 +1,28 @@
 from datetime import timedelta
+from io import BytesIO
 from typing import Annotated
 
+import pandas as pd
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import StreamingResponse
 
-from ..dependencies import get_current_superagent
 from ...core.config import settings
 from ...core.db.database import async_get_db
-from ...core.exceptions.http_exceptions import DuplicateValueException, NotFoundException
-
+from ...core.exceptions.http_exceptions import (
+    DuplicateValueException,
+    NotFoundException,
+)
 from ...crud.crud_tour import crud_tours
-import pandas as pd
-from ...schemas.tour import TourCreate, TourRead, TourUpdate, TourCreateInternal
-from io import BytesIO
+from ...schemas.tour import TourCreate, TourCreateInternal, TourRead, TourUpdate
+from ..dependencies import get_current_superagent
 
 router = APIRouter(tags=["tour"])
 
 
 @router.post("/tour", response_model=TourRead, status_code=201)
 async def add_tour(
-        request: Request, tour: TourCreate, db: Annotated[AsyncSession, Depends(async_get_db)]
+    request: Request, tour: TourCreate, db: Annotated[AsyncSession, Depends(async_get_db)]
 ) -> TourRead:
     title = await crud_tours.exists(db=db, title=tour.title)
     if title:
@@ -35,9 +37,7 @@ async def add_tour(
 
 
 @router.get("/tours", response_class=StreamingResponse)
-async def get_all_tours(
-        request: Request, db: Annotated[AsyncSession, Depends(async_get_db)]
-):
+async def get_all_tours(request: Request, db: Annotated[AsyncSession, Depends(async_get_db)]):
     # Получение данных
     reviews_data = await crud_tours.get_multi(
         db=db,
@@ -45,11 +45,11 @@ async def get_all_tours(
         limit=settings.INT_MAX_TOUR,
         schema_to_select=TourRead,
         return_as_model=True,  # Данные возвращаются как модели Pydantic
-        is_deleted=False
+        is_deleted=False,
     )
 
     # Конвертация данных в DataFrame
-    df = pd.DataFrame([tour.dict() for tour in reviews_data['data']])
+    df = pd.DataFrame([tour.dict() for tour in reviews_data["data"]])
 
     # Преобразование datetime с временной зоной в без временной зоны
     for col in df.columns:
@@ -58,7 +58,7 @@ async def get_all_tours(
 
     # Сохранение DataFrame в Excel
     output = BytesIO()
-    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+    with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
         df.to_excel(writer, index=False)
     output.seek(0)
 
@@ -66,17 +66,17 @@ async def get_all_tours(
     response = StreamingResponse(
         output,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": "attachment; filename=tours.xlsx"}
+        headers={"Content-Disposition": "attachment; filename=tours.xlsx"},
     )
     return response
 
 
 @router.patch("/tour/{tour_id}")
 async def update_tour(
-        request: Request,
-        tour_id: int,
-        updated_tour: TourUpdate,
-        db: Annotated[AsyncSession, Depends(async_get_db)],
+    request: Request,
+    tour_id: int,
+    updated_tour: TourUpdate,
+    db: Annotated[AsyncSession, Depends(async_get_db)],
 ) -> dict[str, str]:
     db_tour_id = await crud_tours.get(db=db, schema_to_select=TourRead, id=tour_id)
     if db_tour_id is None:
@@ -88,9 +88,9 @@ async def update_tour(
 
 @router.delete("/tour/{tour_id}")
 async def delete_tour(
-        request: Request,
-        tour_id: int,
-        db: Annotated[AsyncSession, Depends(async_get_db)],
+    request: Request,
+    tour_id: int,
+    db: Annotated[AsyncSession, Depends(async_get_db)],
 ) -> dict[str, str]:
     db_tour_id = await crud_tours.get(db=db, schema_to_select=TourRead, id=tour_id)
     if db_tour_id is None:
@@ -101,9 +101,9 @@ async def delete_tour(
 
 
 @router.delete("/tours")
-async def delete_all_tours(request: Request,
-                           self_agent_id: int,
-                           db: Annotated[AsyncSession, Depends(async_get_db)]) -> dict[str, str]:
+async def delete_all_tours(
+    request: Request, self_agent_id: int, db: Annotated[AsyncSession, Depends(async_get_db)]
+) -> dict[str, str]:
     await get_current_superagent(self_agent_id, db)
 
     await crud_tours.delete(db=db, allow_multiple=True)

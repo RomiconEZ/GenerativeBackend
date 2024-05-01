@@ -1,13 +1,12 @@
+import os
 import re
+import subprocess
 from pathlib import Path
 
-import torch
 import soundfile as sf
-import os
-
+import torch
 from icecream import ic
 from langdetect import detect
-import subprocess
 
 from ..ML_Assets.core_object import DEVICE
 
@@ -27,7 +26,7 @@ def detect_language(text):
 
 def filter_text(text):
     # Filter unwanted characters
-    filtered_text = re.sub(r'[^\w\s,.:\u00C0-\u00FF]', '', text)  # Removed newline filter
+    filtered_text = re.sub(r"[^\w\s,.:\u00C0-\u00FF]", "", text)  # Removed newline filter
     return filtered_text
 
 
@@ -40,17 +39,13 @@ def synthesize_speech_piper(text, model_path, output_file):
     if not os.access(piper_executable, os.X_OK):
         raise PermissionError("Piper executable is not executable.")
 
-    command = [
-        str(piper_executable),
-        '--model', str(model_path),
-        '--output_file', output_file
-    ]
+    command = [str(piper_executable), "--model", str(model_path), "--output_file", output_file]
 
     try:
         subprocess.run(
             command,
-            input=(filter_text(text)).encode('utf-8'),
-            check=True  # Обеспечивает вызов исключения, если команда завершается с ошибкой
+            input=(filter_text(text)).encode("utf-8"),
+            check=True,  # Обеспечивает вызов исключения, если команда завершается с ошибкой
         )
     except subprocess.CalledProcessError as e:
         ic(f"Error in generating audio: {e}")
@@ -69,18 +64,28 @@ async def text2audio(text, audiofile_name):
     language = detect_language(text)
 
     parent_path = Path(__file__).parent
-    if language == 'ru':
-        local_model_file = parent_path / 'local_model' / 'ru_piper_voice' / 'ru_RU-irina-medium.onnx'
+    if language == "ru":
+        local_model_file = (
+            parent_path / "local_model" / "ru_piper_voice" / "ru_RU-irina-medium.onnx"
+        )
         if not local_model_file.exists():
-            raise FileNotFoundError("RU voice model executable not found at the expected location.")
+            raise FileNotFoundError(
+                "RU voice model executable not found at the expected location."
+            )
     else:
-        local_model_file = parent_path / 'local_model' / 'en_piper_voice' / 'en_US-libritts_r-medium.onnx'
+        local_model_file = (
+            parent_path / "local_model" / "en_piper_voice" / "en_US-libritts_r-medium.onnx"
+        )
         if not local_model_file.exists():
-            raise FileNotFoundError("ENG voice model executable not found at the expected location.")
+            raise FileNotFoundError(
+                "ENG voice model executable not found at the expected location."
+            )
 
     temporary_customer_files_dir_parent = Path(__file__).parent.parent.parent.parent
-    audiofile_path = str(temporary_customer_files_dir_parent /
-                         f"temporary_customer_files/audio_files/{audiofile_name}.wav")
+    audiofile_path = str(
+        temporary_customer_files_dir_parent
+        / f"temporary_customer_files/audio_files/{audiofile_name}.wav"
+    )
 
     synthesize_speech_piper(text, local_model_file, audiofile_path)
 
@@ -98,10 +103,14 @@ async def textfile2audio_silero(textfile_name, audiofile_name):
 
     """
     temporary_customer_files_dir_parent = Path(__file__).parent.parent.parent.parent
-    textfile_path = str(temporary_customer_files_dir_parent /
-                        f"temporary_customer_files/text_files/{textfile_name}.pdf")
-    audiofile_path = str(temporary_customer_files_dir_parent /
-                         f"temporary_customer_files/audio_files/{audiofile_name}.ogg")
+    textfile_path = str(
+        temporary_customer_files_dir_parent
+        / f"temporary_customer_files/text_files/{textfile_name}.pdf"
+    )
+    audiofile_path = str(
+        temporary_customer_files_dir_parent
+        / f"temporary_customer_files/audio_files/{audiofile_name}.ogg"
+    )
 
     if os.path.exists(textfile_path) is False:
         return
@@ -127,10 +136,10 @@ async def text2audio_silero(text, audiofile_name):
     language = detect_language(text)
 
     parent_path = Path(__file__).parent
-    if language == 'en':
+    if language == "en":
         return None
     else:
-        local_file = parent_path / 'local_model' / 'model_silero_ru.pt'
+        local_file = parent_path / "local_model" / "model_silero_ru.pt"
         speaker = "aidar"
         put_accent = True
         put_yo = True
@@ -150,8 +159,10 @@ async def text2audio_silero(text, audiofile_name):
     )
 
     temporary_customer_files_dir_parent = Path(__file__).parent.parent.parent.parent
-    audiofile_path = str(temporary_customer_files_dir_parent /
-                         f"temporary_customer_files/audio_files/{audiofile_name}.ogg")
+    audiofile_path = str(
+        temporary_customer_files_dir_parent
+        / f"temporary_customer_files/audio_files/{audiofile_name}.ogg"
+    )
 
     sf.write(audiofile_path, audio, sample_rate)
 
