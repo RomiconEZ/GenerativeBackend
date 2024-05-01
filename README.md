@@ -58,7 +58,7 @@ Link to project in GitHub: https://github.com/RomiconEZ/GenerativeBackend
 
 Данный Backend сервис является частью система автоматизации контакт-центра для тур-бизнеса.
 
-Он является связующим свеном между чат-ботами для клиентов и для агентов.
+Он является связующим звеном между чат-ботами для клиентов и для агентов.
 
 Основная цель Backend-а - генерация текстовых и звуковых ответов на вопросы пользователя, 
 а также перенаправление пользователей к агентам.
@@ -81,6 +81,7 @@ LangChain используется для обработки и управлен
 ### Built With / Технологический стек
 
 * ![Python][Python.com]
+* ![Fastapi][Fastapi.com]
 * ![Docker][Docker.com]
 * <img src="readme_images/langchain-chroma-light.png" alt="lc_ch" style="width:160px; height:auto;">
 * Init Backend Template: https://github.com/igorbenav/FastAPI-boilerplate
@@ -158,7 +159,7 @@ Roman Neronov:
 
 [Python.com]: https://img.shields.io/badge/Python-14354C?style=for-the-badge&logo=python&logoColor=white
 
-[fastapi.com]: https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi
+[Fastapi.com]: https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi
 
 [Docker.com]: https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white
 
