@@ -1,8 +1,5 @@
-## 2. Contents
+## Contents
 
-0. [About](#0-about)
-1. [Features](#1-features)
-1. [Contents](#2-contents)
 1. [Prerequisites](#3-prerequisites)
    1. [Environment Variables (.env)](#31-environment-variables-env)
    1. [Docker Compose](#32-docker-compose-preferred)
@@ -45,6 +42,8 @@
 1. [Contact](#11-contact)
 
 ______________________________________________________________________
+
+## 3. Prerequisites
 
 - [Running locally with uvicorn](https://gist.github.com/igorbenav/48ad745120c3f77817e094f3a609111a)
 - [Runing in staging with gunicorn managing uvicorn workers](https://gist.github.com/igorbenav/d0518d4f6bdfb426d4036090f74905ee)

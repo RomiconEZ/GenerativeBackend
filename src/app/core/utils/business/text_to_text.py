@@ -13,6 +13,11 @@ NO_SUMMARY_TEXT = "История общения с ботом отсутств�
 ERROR_SUMMARY_TEXT = "Произошла ошибка на этапе генерации суммаризации"
 
 
+def fix_double_backslashes(text):
+    """Заменяет двойные обратные слэши на одинарные."""
+    return text.replace('\\\\', '\\')
+
+
 def convert_context_to_utf8_text(context: List[Dict[str, str]]) -> str:
     utf8_context = [{key: str(value) for key, value in item.items()} for item in context]
     user_messages = json.dumps(utf8_context, ensure_ascii=False)
@@ -28,14 +33,12 @@ async def generate_answer_to_user_question(
         context = []
         return context
 
-    ic(context)
-
     human_input = context[-1].get("content", "No query")
     temp_context = context[
                    :-1
                    ]  # без последнего сообщения от пользователя, чтобы вставить промпт
     try:
-        search_results = VECTOR_DB_CompDesc.similarity_search(human_input, k=2)
+        search_results = VECTOR_DB_CompDesc.similarity_search(human_input, k=1)
         for result in search_results:
             some_context += result.page_content + "\n"
     except Exception as e:
@@ -45,7 +48,6 @@ async def generate_answer_to_user_question(
     temp_context.append({"role": "user", "content": human_input})
     new_message = {"role": "assistant", "content": ""}
 
-    ic(temp_context)
     try:
         completion = LLM_MODEL.chat.completions.create(
             model="local-model",
@@ -77,7 +79,6 @@ async def generate_summary_to_user_history(
         {"role": "system", "content": SUMMARY_PROMPT},
         {"role": "user", "content": user_messages},
     ]
-    ic(temp_context)
 
     try:
         completion = LLM_MODEL.chat.completions.create(
@@ -88,7 +89,7 @@ async def generate_summary_to_user_history(
         )
 
         if completion.choices[0].message.content:
-            summary = completion.choices[0].message.content
+            summary = fix_double_backslashes(completion.choices[0].message.content)
         else:
             summary = ERROR_SUMMARY_TEXT
     except Exception as e:

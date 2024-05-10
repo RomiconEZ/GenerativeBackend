@@ -13,13 +13,16 @@ def detect_language(text):
     """
     Determining the language of the text (Russian or English) using the langdetect library
     """
-    lang = detect(text)
-    if lang == "ru":
+    try:
+        lang = detect(text)
+        if lang == "ru":
+            return "ru"
+        elif lang == "en":
+            return "en"
+        else:
+            return "en"
+    except:
         return "ru"
-    elif lang == "en":
-        return "en"
-    else:
-        return None
 
 
 def filter_text(text):
@@ -46,7 +49,7 @@ def synthesize_speech_piper(text, model_path, output_file):
             check=True,  # Обеспечивает вызов исключения, если команда завершается с ошибкой
         )
     except subprocess.CalledProcessError as e:
-        ic(f"Error in generating audio: {e}")
+        print(f"Error in generating audio: {e}")
 
 
 async def text2audio(text, audiofile_name):

@@ -33,7 +33,6 @@ async def get_all_reviews(
         sort_orders='asc'
     )
 
-    ic(reviews_data)
     # Конвертация данных в DataFrame
     df = pd.DataFrame([review for review in reviews_data["data"]])
 

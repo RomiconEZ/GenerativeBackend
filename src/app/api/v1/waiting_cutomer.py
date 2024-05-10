@@ -125,7 +125,6 @@ async def get_waiting_customer(
     result = await db.execute(stmt)
 
     customer_with_longest_waiting_time: WaitingCustomersRead | None = result.first()
-    ic(customer_with_longest_waiting_time)
 
     if customer_with_longest_waiting_time:
         # Получаем выбранного клиента как словарь
