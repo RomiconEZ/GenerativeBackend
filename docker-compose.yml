@@ -90,6 +90,7 @@ services:
     command: python -m src.scripts.create_first_superagent
     volumes:
       - ./src:/code/src
+    user: root
 
   #-------- uncomment to run tests --------
 #  pytest:

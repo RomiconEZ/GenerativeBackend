@@ -90,12 +90,22 @@ async def create_first_user(session: AsyncSession) -> None:
             logger.info(f"Admin agent {username_telegram} already exists.")
 
     except Exception as e:
-        logger.error(f"Error creating admin agent: {e}")
+        raise
 
 
 async def main():
+    retry_attempts = 4
     async with local_session() as session:
-        await create_first_user(session)
+        for attempt in range(retry_attempts):
+            try:
+                await create_first_user(session)
+                break  # Если выполнение успешно, выйти из цикла
+            except Exception as e:
+                logger.error(f"Attempt {attempt + 1}/{retry_attempts} - Error creating admin agent: {e}")
+                if attempt < retry_attempts - 1:
+                    await asyncio.sleep(4)  # Задержка перед повторной попыткой
+                else:
+                    logger.error("Exceeded maximum retry attempts.")
 
 
 if __name__ == "__main__":
