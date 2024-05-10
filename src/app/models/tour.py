@@ -1,9 +1,10 @@
 import uuid as uuid_pkg
-from datetime import UTC, datetime
+from datetime import datetime
 
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
+from ..core.timezone import UTC_PLUS_3
 from ..core.db.database import Base
 
 
@@ -27,7 +28,7 @@ class Tour(Base):
     )
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default_factory=lambda: datetime.now(UTC)
+        DateTime(timezone=True), default_factory=lambda: datetime.now(UTC_PLUS_3)
     )
     updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)

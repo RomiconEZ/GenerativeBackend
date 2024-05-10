@@ -5,7 +5,6 @@ from typing import Annotated
 import pandas as pd
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
-from icecream import ic
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...core.config import settings

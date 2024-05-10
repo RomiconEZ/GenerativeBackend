@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import uuid
-from datetime import UTC, datetime
+from datetime import datetime
 
 from sqlalchemy import (
     Boolean,
@@ -17,6 +17,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.postgresql import UUID
 
+from ..app.core.timezone import UTC_PLUS_3
 from ..app.core.config import settings
 from ..app.core.db.database import AsyncSession, async_engine, local_session
 from ..app.models.agent import Agent
@@ -60,7 +61,7 @@ async def create_first_user(session: AsyncSession) -> None:
                 Column(
                     "created_at",
                     DateTime(timezone=True),
-                    default=lambda: datetime.now(UTC),
+                    default=lambda: datetime.now(UTC_PLUS_3),
                     nullable=False,
                 ),
                 Column("updated_at", DateTime),

@@ -1,4 +1,5 @@
 import json
+import re
 from typing import Any, Dict, List, Optional
 
 from icecream import ic
@@ -17,6 +18,18 @@ def fix_double_backslashes(text):
     """Заменяет двойные обратные слэши на одинарные."""
     return text.replace('\\\\', '\\')
 
+
+def replace_tag_quotes(text: str) -> str:
+    """
+    Заменяет угловые скобки тегов на круглые скобки в тексте.
+
+    Args:
+        text (str): Исходный текст.
+
+    Returns:
+        str: Текст с замененными скобками.
+    """
+    return re.sub(r'<(.*?)>', r'(\1)', text)
 
 def convert_context_to_utf8_text(context: List[Dict[str, str]]) -> str:
     utf8_context = [{key: str(value) for key, value in item.items()} for item in context]
@@ -90,6 +103,7 @@ async def generate_summary_to_user_history(
 
         if completion.choices[0].message.content:
             summary = fix_double_backslashes(completion.choices[0].message.content)
+            summary = replace_tag_quotes(summary)
         else:
             summary = ERROR_SUMMARY_TEXT
     except Exception as e:

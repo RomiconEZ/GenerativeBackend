@@ -20,7 +20,7 @@ def init_vector_db(filename: str):
         docs.extend(file.load())  # Загрузка текста из PDF-файлов
 
     # Разбиение текста на части
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=300)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=600, chunk_overlap=400)
     docs = text_splitter.split_documents(docs)
 
     # Создание векторного представления текста
