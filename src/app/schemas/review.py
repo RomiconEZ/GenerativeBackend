@@ -29,6 +29,19 @@ class ReviewRead(BaseModel):
     created_at: datetime
 
 
+class ReviewGet(BaseModel):
+    text: Annotated[
+        str,
+        Field(min_length=1, max_length=63206, examples=["This is the content of my review."]),
+    ]
+    created_by_customer_id: int
+    created_at: datetime
+
+
+class ReviewSend(ReviewGet):
+    customer_telegram_username: Annotated[str, Field(min_length=1, max_length=60, examples=["tg_name"])]
+
+
 class ReviewCreate(ReviewBase):
     model_config = ConfigDict(extra="forbid")
 

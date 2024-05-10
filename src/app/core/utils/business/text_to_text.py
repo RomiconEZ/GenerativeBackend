@@ -13,8 +13,14 @@ NO_SUMMARY_TEXT = "История общения с ботом отсутств�
 ERROR_SUMMARY_TEXT = "Произошла ошибка на этапе генерации суммаризации"
 
 
+def convert_context_to_utf8_text(context: List[Dict[str, str]]) -> str:
+    utf8_context = [{key: str(value) for key, value in item.items()} for item in context]
+    user_messages = json.dumps(utf8_context, ensure_ascii=False)
+    return user_messages
+
+
 async def generate_answer_to_user_question(
-    context: Optional[List[Dict[str, str]]] = None
+        context: Optional[List[Dict[str, str]]] = None
 ) -> List[Dict[str, str]]:
     some_context = RAG_PROMPT
 
@@ -22,12 +28,12 @@ async def generate_answer_to_user_question(
         context = []
         return context
 
+    ic(context)
+
     human_input = context[-1].get("content", "No query")
-    ic(human_input)
     temp_context = context[
-        :-1
-    ]  # без последнего сообщения от пользователя, чтобы вставить промпт
-    ic(temp_context)
+                   :-1
+                   ]  # без последнего сообщения от пользователя, чтобы вставить промпт
     try:
         search_results = VECTOR_DB_CompDesc.similarity_search(human_input, k=2)
         for result in search_results:
@@ -37,13 +43,14 @@ async def generate_answer_to_user_question(
 
     temp_context.append({"role": "system", "content": some_context})
     temp_context.append({"role": "user", "content": human_input})
-    ic(temp_context)
     new_message = {"role": "assistant", "content": ""}
+
+    ic(temp_context)
     try:
         completion = LLM_MODEL.chat.completions.create(
             model="local-model",
             messages=temp_context,
-            temperature=0.1,
+            temperature=0.2,
             stream=False,
         )
 
@@ -51,22 +58,26 @@ async def generate_answer_to_user_question(
             new_message["content"] = completion.choices[0].message.content
     except Exception as e:
         new_message["content"] = GENERATION_ERROR_TEXT
-    ic(new_message)
     context.append(new_message)
 
     return context
 
 
 async def generate_summary_to_user_history(
-    context: Optional[List[Dict[str, str]]] = None
+        context: Optional[List[Dict[str, str]]] = None
 ) -> str:
     if not context:
         return NO_SUMMARY_TEXT
 
+    # Convert JSON strings to plain UTF-8
+    utf8_context = [{key: str(value) for key, value in item.items()} for item in context]
+    user_messages = json.dumps(utf8_context, ensure_ascii=False)
+
     temp_context = [
         {"role": "system", "content": SUMMARY_PROMPT},
-        {"role": "user", "content": json.dumps(context)},
+        {"role": "user", "content": user_messages},
     ]
+    ic(temp_context)
 
     try:
         completion = LLM_MODEL.chat.completions.create(

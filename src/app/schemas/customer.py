@@ -33,6 +33,11 @@ class CustomerRead(CustomerBase):
     tier_id: int | None = None
 
 
+class CustomerIdUsername(BaseModel):
+    id: int
+    username_telegram: Annotated[str, Field(min_length=1, max_length=60, examples=["tg_name"])]
+
+
 class CustomerCreate(CustomerBase):
     model_config = ConfigDict(extra="forbid")
 

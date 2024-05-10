@@ -41,8 +41,6 @@ async def get_all_tours(request: Request, db: Annotated[AsyncSession, Depends(as
     # Получение данных
     reviews_data = await crud_tours.get_multi(
         db=db,
-        offset=0,
-        limit=settings.INT_MAX_TOUR,
         schema_to_select=TourRead,
         return_as_model=True,  # Данные возвращаются как модели Pydantic
         is_deleted=False,

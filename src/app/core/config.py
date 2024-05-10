@@ -67,13 +67,14 @@ class FirstUserSettings(BaseSettings):
     ADMIN_NAME: str = config("ADMIN_NAME", default="admin")
     ADMIN_EMAIL: str = config("ADMIN_EMAIL", default="admin@admin.com")
     ADMIN_USERNAME: str = config("ADMIN_USERNAME", default="admin")
-    ADMIN_PASSWORD: str = config("ADMIN_PASSWORD", default="!Ch4ng3Th1sP4ssW0rd!")
+    ADMIN_PASSWORD: str = config("ADMIN_PASSWORD", default="ADMIN_PASSWORD")
 
 
 class SuperAgentSettings(BaseSettings):
-    ADMIN_AGENT_NAME: str = config("ADMIN_AGENT_NAME", default="Roman")
+    ADMIN_AGENT_NAME: str = config("ADMIN_AGENT_NAME", default="ADMIN_AGENT_NAME")
+    ADMIN_AGENT_SURNAME: str = config("ADMIN_AGENT_SURNAME", default="ADMIN_AGENT_SURNAME")
     ADMIN_AGENT_EMAIL: str = config("ADMIN_AGENT_EMAIL", default="admin@admin.com")
-    ADMIN_AGENT_ID: str = config("ADMIN_AGENT_ID", default=2405)
+    ADMIN_AGENT_ID: str = config("ADMIN_AGENT_ID", default=1)
     ADMIN_AGENT_USERNAME: str = config("ADMIN_AGENT_USERNAME", default="admin")
 
 
@@ -118,9 +119,6 @@ class EnvironmentOption(Enum):
 
 class BusinessSettings(BaseSettings):
     TIME_ZONE: int = config("TIME_ZONE", default=3)
-    INT_MAX_REVIEWS: int = config("INT_MAX_REVIEWS", default=1000000)
-    INT_MAX_TOUR: int = config("INT_MAX_TOUR", default=10000000)
-    INT_MAX_AGENTS: int = config("INT_MAX_AGENTS", default=1000)
     PROCESSOR_ARCHITECTURES: str = config("PROCESSOR_ARCHITECTURES", default="arm64")
 
 

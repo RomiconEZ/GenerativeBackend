@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 async def create_first_user(session: AsyncSession) -> None:
     try:
         name = settings.ADMIN_AGENT_NAME
+        surname = settings.ADMIN_AGENT_SURNAME
         agent_id = int(settings.ADMIN_AGENT_ID)
         email = settings.ADMIN_AGENT_EMAIL
         username_telegram = settings.ADMIN_AGENT_USERNAME
@@ -71,6 +72,7 @@ async def create_first_user(session: AsyncSession) -> None:
 
             data = {
                 "name": name,
+                "surname": surname,
                 "id": agent_id,
                 "email": email,
                 "username_telegram": username_telegram,

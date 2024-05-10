@@ -1,8 +1,8 @@
 import asyncio
-from typing import Annotated, Any, Dict, List
+from typing import Annotated, Dict, List
 
 from arq.jobs import Job as ArqJob
-from fastapi import APIRouter, Depends, Request, Response, status
+from fastapi import APIRouter, Depends, Request, status, HTTPException
 from icecream import ic
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import Response
@@ -11,12 +11,13 @@ from ...core.db.database import async_get_db
 from ...core.exceptions.http_exceptions import NotFoundException
 from ...core.utils import queue
 from ...crud.crud_agent import crud_agents
+from ...crud.crud_customer import crud_customers
 from ...crud.crud_waiting_customers import crud_waiting_customers
-from ...schemas.customer import CustomerCreate
+from ...schemas.customer import CustomerCreate, CustomerRead
 from ...schemas.waiting_customers import (
     WaitingCustomersCreateInternal,
     WaitingCustomersRead,
-    WaitingCustomersUpdate,
+    WaitingCustomersUpdate, WaitingCustomersGet,
 )
 from ..dependencies import check_current_customer_else_create
 
@@ -28,10 +29,10 @@ NO_SUMMARY_TEXT = "История общения с ботом отсутств�
 
 @router.post("/waiting_customer", response_model=WaitingCustomersRead, status_code=201)
 async def add_waiting_customer(
-    request: Request,
-    customer: CustomerCreate,
-    db: Annotated[AsyncSession, Depends(async_get_db)],
-    context: List[Dict[str, str]] = None,
+        request: Request,
+        customer: CustomerCreate,
+        db: Annotated[AsyncSession, Depends(async_get_db)],
+        context: List[Dict[str, str]] = None,
 ) -> Response | WaitingCustomersRead:
     await check_current_customer_else_create(customer, db)
 
@@ -43,7 +44,6 @@ async def add_waiting_customer(
         return Response(
             status_code=status.HTTP_409_CONFLICT, content="Waiting customer already exists"
         )
-
     if context is None or context == []:
         summary = NO_SUMMARY_TEXT
     else:
@@ -76,10 +76,10 @@ async def add_waiting_customer(
 
 @router.patch("/waiting_customer")
 async def update_waiting_customer(
-    request: Request,
-    customer_id: int,
-    values: WaitingCustomersUpdate,
-    db: Annotated[AsyncSession, Depends(async_get_db)],
+        request: Request,
+        customer_id: int,
+        values: WaitingCustomersUpdate,
+        db: Annotated[AsyncSession, Depends(async_get_db)],
 ) -> dict[str, str]:
     waiting_customer_id = await crud_waiting_customers.get(
         db=db, schema_to_select=WaitingCustomersRead, customer_id=customer_id
@@ -87,9 +87,10 @@ async def update_waiting_customer(
     if waiting_customer_id is None:
         raise NotFoundException("Waiting customer not found")
 
-    db_agent = await crud_agents.exists(db=db, id=values.agent_id)
-    if not db_agent:
-        raise NotFoundException("Agent not found")
+    if values.agent_id is not None:
+        db_agent = await crud_agents.exists(db=db, id=values.agent_id)
+        if not db_agent:
+            raise NotFoundException("Agent not found")
 
     await crud_waiting_customers.update(db=db, object=values, customer_id=customer_id)
     return {"message": "Waiting customer updated"}
@@ -97,9 +98,9 @@ async def update_waiting_customer(
 
 @router.delete("/waiting_customer")
 async def delete_waiting_customer(
-    request: Request,
-    customer_id: int,
-    db: Annotated[AsyncSession, Depends(async_get_db)],
+        request: Request,
+        customer_id: int,
+        db: Annotated[AsyncSession, Depends(async_get_db)],
 ) -> dict[str, str]:
     waiting_customer_id = await crud_waiting_customers.get(
         db=db, schema_to_select=WaitingCustomersRead, customer_id=customer_id
@@ -111,31 +112,57 @@ async def delete_waiting_customer(
     return {"message": f"Waiting customer {customer_id} deleted"}
 
 
-@router.get("/waiting_customer", response_model=tuple[WaitingCustomersRead, int])
+@router.get("/waiting_customer", response_model=tuple[WaitingCustomersGet | None, int])
 async def get_waiting_customer(
-    request: Request, db: Annotated[AsyncSession, Depends(async_get_db)]
-) -> tuple[WaitingCustomersRead | None, int]:
+        request: Request, db: Annotated[AsyncSession, Depends(async_get_db)]
+) -> tuple[WaitingCustomersGet, int] | tuple[None, int]:
     stmt = await crud_waiting_customers.select(
-        schema_to_select=WaitingCustomersRead, sort_columns="created_at", sort_orders="asc"
+        schema_to_select=WaitingCustomersRead,
+        sort_columns="created_at", sort_orders="asc",
+        agent_id=None, limit=1
     )
-    # Добавляем limit к запросу вручную после его создания
-    limited_stmt = stmt.limit(1)
     # Выполняем запрос и получаем результат
-    result = await db.execute(limited_stmt)
+    result = await db.execute(stmt)
 
     customer_with_longest_waiting_time: WaitingCustomersRead | None = result.first()
     ic(customer_with_longest_waiting_time)
+
     if customer_with_longest_waiting_time:
+        # Получаем выбранного клиента как словарь
+        selected_customer_dict = await crud_customers.get(
+            db=db,
+            id=customer_with_longest_waiting_time.customer_id,
+            is_deleted=False
+        )
+
+        if not selected_customer_dict:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found")
+
+        # Преобразуем результат к объекту `CustomerRead`
+        selected_customer = CustomerRead(**selected_customer_dict)
+
+        # Создаем экземпляр WaitingCustomersGet с объединенными данными
+        waiting_customer = WaitingCustomersGet(
+            customer_id=customer_with_longest_waiting_time.customer_id,
+            agent_id=customer_with_longest_waiting_time.agent_id,
+            problem_summary=customer_with_longest_waiting_time.problem_summary,
+            created_at=customer_with_longest_waiting_time.created_at,
+
+            customer_telegram_username=selected_customer.username_telegram,
+            customer_name=selected_customer.name,
+            customer_surname=selected_customer.surname,
+            customer_patronymic=selected_customer.patronymic,
+        )
+
         count = int(await crud_waiting_customers.count(db))
-        ic(count)
-        return customer_with_longest_waiting_time, count
+        return waiting_customer, count
     else:
         return None, 0
 
 
 @router.get("/waiting_customer_count", response_model=int)
 async def get_count_waiting_customer(
-    request: Request, db: Annotated[AsyncSession, Depends(async_get_db)]
+        request: Request, db: Annotated[AsyncSession, Depends(async_get_db)]
 ) -> int:
     count = await crud_waiting_customers.count(db)
 
