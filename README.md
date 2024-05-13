@@ -66,7 +66,7 @@ Link to project in GitHub: https://github.com/RomiconEZ/GenerativeBackend
 Для ответов на запросы пользователя используется локально развернутая LLM:
 IlyaGusev/saiga_mistral_7b_gguf с помощью LM studio и RAG.
 
-RAG: В качестве модели для эмбеддингов используется "sentence-transformers/multi-qa-mpnet-base-dot-v1".
+RAG: В качестве модели для эмбеддингов используется "intfloat/multilingual-e5-large-instruct".
 Chroma используется для создания и использования векторного представления текстовых данных.
 LangChain используется для обработки и управления текстовыми данными.
 База знаний содержит файл с информацией о туроператоре (все совпадения случайны).
