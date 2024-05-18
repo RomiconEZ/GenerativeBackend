@@ -90,8 +90,6 @@ LangChain используется для обработки и управлен
 * ![Fastapi][Fastapi.com]
 * ![Docker][Docker.com]
 * <img src="readme_images/langchain-chroma-light.png" alt="lc_ch" style="width:160px; height:auto;">
-* Init Backend Template: https://github.com/igorbenav/FastAPI-boilerplate
-
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
