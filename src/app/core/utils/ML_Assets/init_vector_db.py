@@ -5,8 +5,8 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 
-#EMBEDDING_MODEL_NAME = "sentence-transformers/multi-qa-mpnet-base-dot-v1" # альтернатива
-EMBEDDING_MODEL_NAME = 'intfloat/multilingual-e5-large-instruct'
+# EMBEDDING_MODEL_NAME = "sentence-transformers/multi-qa-mpnet-base-dot-v1" # альтернатива
+EMBEDDING_MODEL_NAME = "intfloat/multilingual-e5-large-instruct"
 
 
 def init_vector_db(filename: str):
@@ -32,9 +32,7 @@ def init_vector_db(filename: str):
         docs, embedding_function, persist_directory=f"./chroma_db_{filename}"
     )
 
-    embedding_function = HuggingFaceEmbeddings(
-        model_name=EMBEDDING_MODEL_NAME
-    )
+    embedding_function = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL_NAME)
     vector_db = Chroma(
         persist_directory=f"./chroma_db_{filename}", embedding_function=embedding_function
     )

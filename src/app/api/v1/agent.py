@@ -7,7 +7,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
-from ...api.dependencies import get_current_superagent, get_current_agent
+from ...api.dependencies import get_current_agent, get_current_superagent
 from ...core.db.database import async_get_db
 from ...core.exceptions.http_exceptions import (
     DuplicateValueException,
@@ -21,10 +21,10 @@ router = APIRouter(tags=["agent"])
 
 @router.post("/agent", response_model=AgentRead, status_code=201)
 async def write_agent(
-        request: Request,
-        self_agent_id: int,
-        new_agent: AgentCreate,
-        db: Annotated[AsyncSession, Depends(async_get_db)],
+    request: Request,
+    self_agent_id: int,
+    new_agent: AgentCreate,
+    db: Annotated[AsyncSession, Depends(async_get_db)],
 ) -> AgentRead:
     await get_current_superagent(self_agent_id, db)
 
@@ -40,9 +40,9 @@ async def write_agent(
 
 @router.get("/agent", status_code=status.HTTP_200_OK)
 async def check_agent(
-        request: Request,
-        agent_id: int,
-        db: Annotated[AsyncSession, Depends(async_get_db)],
+    request: Request,
+    agent_id: int,
+    db: Annotated[AsyncSession, Depends(async_get_db)],
 ):
     try:
         await get_current_agent(agent_id, db)
@@ -52,10 +52,10 @@ async def check_agent(
 
 @router.patch("/agent/{updated_agent_id}")
 async def update_agent(
-        request: Request,
-        updated_agent_id: int,
-        updated_agent: AgentUpdate,
-        db: Annotated[AsyncSession, Depends(async_get_db)],
+    request: Request,
+    updated_agent_id: int,
+    updated_agent: AgentUpdate,
+    db: Annotated[AsyncSession, Depends(async_get_db)],
 ) -> dict[str, str]:
     db_agent_id = await crud_agents.get(db=db, schema_to_select=AgentRead, id=updated_agent_id)
     if db_agent_id is None:
@@ -67,7 +67,7 @@ async def update_agent(
 
 @router.get("/superagents", response_model=List[int])
 async def get_ids_superagents(
-        request: Request, db: Annotated[AsyncSession, Depends(async_get_db)]
+    request: Request, db: Annotated[AsyncSession, Depends(async_get_db)]
 ):
     # Получение данных суперагентов
     superagents_data = await crud_agents.get_multi(
@@ -75,7 +75,7 @@ async def get_ids_superagents(
         schema_to_select=AgentRead,
         return_as_model=True,  # Убедитесь, что данные возвращаются как модели Pydantic
         is_deleted=False,
-        is_superuser=True
+        is_superuser=True,
     )
 
     # Конвертация данных в DataFrame
@@ -86,7 +86,7 @@ async def get_ids_superagents(
 
 @router.get("/agents", response_class=StreamingResponse)
 async def get_all_agents(
-        request: Request, self_agent_id: int, db: Annotated[AsyncSession, Depends(async_get_db)]
+    request: Request, self_agent_id: int, db: Annotated[AsyncSession, Depends(async_get_db)]
 ):
     # Проверка прав текущего пользователя
     await get_current_superagent(self_agent_id, db)
@@ -119,10 +119,10 @@ async def get_all_agents(
 
 @router.delete("/agent/{delete_agent_id}")
 async def erase_db_agent(
-        request: Request,
-        self_agent_id: int,
-        delete_agent_id: int,
-        db: Annotated[AsyncSession, Depends(async_get_db)],
+    request: Request,
+    self_agent_id: int,
+    delete_agent_id: int,
+    db: Annotated[AsyncSession, Depends(async_get_db)],
 ) -> dict[str, str]:
     await get_current_superagent(self_agent_id, db)
 

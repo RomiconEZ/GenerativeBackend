@@ -16,7 +16,7 @@ ERROR_SUMMARY_TEXT = "Произошла ошибка на этапе генер
 
 def fix_double_backslashes(text):
     """Заменяет двойные обратные слэши на одинарные."""
-    return text.replace('\\\\', '\\')
+    return text.replace("\\\\", "\\")
 
 
 def replace_tag_quotes(text: str) -> str:
@@ -29,7 +29,8 @@ def replace_tag_quotes(text: str) -> str:
     Returns:
         str: Текст с замененными скобками.
     """
-    return re.sub(r'<(.*?)>', r'(\1)', text)
+    return re.sub(r"<(.*?)>", r"(\1)", text)
+
 
 def convert_context_to_utf8_text(context: List[Dict[str, str]]) -> str:
     utf8_context = [{key: str(value) for key, value in item.items()} for item in context]
@@ -38,7 +39,7 @@ def convert_context_to_utf8_text(context: List[Dict[str, str]]) -> str:
 
 
 async def generate_answer_to_user_question(
-        context: Optional[List[Dict[str, str]]] = None
+    context: Optional[List[Dict[str, str]]] = None
 ) -> List[Dict[str, str]]:
     some_context = RAG_PROMPT
 
@@ -48,8 +49,8 @@ async def generate_answer_to_user_question(
 
     human_input = context[-1].get("content", "No query")
     temp_context = context[
-                   :-1
-                   ]  # без последнего сообщения от пользователя, чтобы вставить промпт
+        :-1
+    ]  # без последнего сообщения от пользователя, чтобы вставить промпт
     try:
         search_results = VECTOR_DB_CompDesc.similarity_search(human_input, k=1)
         for result in search_results:
@@ -79,7 +80,7 @@ async def generate_answer_to_user_question(
 
 
 async def generate_summary_to_user_history(
-        context: Optional[List[Dict[str, str]]] = None
+    context: Optional[List[Dict[str, str]]] = None
 ) -> str:
     if not context:
         return NO_SUMMARY_TEXT

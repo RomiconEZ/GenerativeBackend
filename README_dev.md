@@ -1,3 +1,14 @@
+## Formatting
+* black
+    ```bash
+    poetry run black .
+    ```
+* isort
+    ```bash
+    poetry run isort .
+    ```
+
+
 ## Contents
 
 1. [Prerequisites](#3-prerequisites)
@@ -36,10 +47,8 @@
       1. [One Server](#621-one-server)
       1. [Multiple Servers](#622-multiple-servers)
 1. [Testing](#7-testing)
-1. [Contributing](#8-contributing)
-1. [References](#9-references)
-1. [License](#10-license)
-1. [Contact](#11-contact)
+
+
 
 ______________________________________________________________________
 

@@ -1,18 +1,24 @@
 import uuid as uuid_pkg
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, BigInteger
+from sqlalchemy import BigInteger, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ..core.timezone import UTC_PLUS_3
 from ..core.db.database import Base
+from ..core.timezone import UTC_PLUS_3
 
 
 class CustomersWaitingTour(Base):
     __tablename__ = "customers_waiting_tour"
 
     id: Mapped[int] = mapped_column(
-        "id", BigInteger, autoincrement=True, nullable=False, unique=True, primary_key=True, init=False
+        "id",
+        BigInteger,
+        autoincrement=True,
+        nullable=False,
+        unique=True,
+        primary_key=True,
+        init=False,
     )
 
     customer_id: Mapped[int] = mapped_column(

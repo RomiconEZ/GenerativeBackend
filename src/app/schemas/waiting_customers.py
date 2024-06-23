@@ -53,7 +53,9 @@ class WaitingCustomersGet(BaseModel):
         ),
     ]
     created_at: datetime
-    customer_telegram_username: Annotated[str, Field(min_length=1, max_length=60, examples=["tg_name"])]
+    customer_telegram_username: Annotated[
+        str, Field(min_length=1, max_length=60, examples=["tg_name"])
+    ]
     customer_name: Annotated[
         str | None, Field(min_length=1, max_length=30, examples=["Name"], default=None)
     ]

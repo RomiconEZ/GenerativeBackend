@@ -39,7 +39,9 @@ class ReviewGet(BaseModel):
 
 
 class ReviewSend(ReviewGet):
-    customer_telegram_username: Annotated[str, Field(min_length=1, max_length=60, examples=["tg_name"])]
+    customer_telegram_username: Annotated[
+        str, Field(min_length=1, max_length=60, examples=["tg_name"])
+    ]
 
 
 class ReviewCreate(ReviewBase):

@@ -1,12 +1,15 @@
 import os
 from typing import Annotated, Dict, List
+
 from arq.jobs import Job as ArqJob
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from ...api.dependencies import check_current_customer_else_create, rate_limiter
 from ...core.db.database import async_get_db
 from ...core.utils import queue
+from ...crud.crud_agent import crud_agents
 
 # ---- Нельзя удалять, так как нужно для инициализации таблиц -----
 from ...crud.crud_customer import crud_customers
@@ -14,8 +17,6 @@ from ...crud.crud_customers_waiting_tour import crud_customers_waiting_tour
 from ...crud.crud_review import crud_reviews
 from ...crud.crud_tour import crud_tours
 from ...crud.crud_waiting_customers import crud_waiting_customers
-from ...crud.crud_agent import crud_agents
-
 from ...schemas.audio_generation import AudioGenerationRequest
 from ...schemas.customer import CustomerCreate
 from ...schemas.job import Job

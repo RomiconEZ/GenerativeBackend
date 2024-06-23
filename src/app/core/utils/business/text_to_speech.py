@@ -33,7 +33,9 @@ def filter_text(text):
 
 def synthesize_speech_piper(text, model_path, output_file):
     parent_path = Path(__file__).parent
-    piper_executable = parent_path / "local_lib" / f"piper_{settings.PROCESSOR_ARCHITECTURES}" / "piper"
+    piper_executable = (
+        parent_path / "local_lib" / f"piper_{settings.PROCESSOR_ARCHITECTURES}" / "piper"
+    )
 
     if not piper_executable.exists():
         raise FileNotFoundError("Piper executable not found at the expected location.")
@@ -67,7 +69,7 @@ async def text2audio(text, audiofile_name):
     parent_path = Path(__file__).parent
     if language == "ru":
         local_model_file = (
-                parent_path / "local_model" / "ru_piper_voice" / "ru_RU-irina-medium.onnx"
+            parent_path / "local_model" / "ru_piper_voice" / "ru_RU-irina-medium.onnx"
         )
         if not local_model_file.exists():
             raise FileNotFoundError(
@@ -75,7 +77,7 @@ async def text2audio(text, audiofile_name):
             )
     else:
         local_model_file = (
-                parent_path / "local_model" / "en_piper_voice" / "en_US-libritts_r-medium.onnx"
+            parent_path / "local_model" / "en_piper_voice" / "en_US-libritts_r-medium.onnx"
         )
         if not local_model_file.exists():
             raise FileNotFoundError(

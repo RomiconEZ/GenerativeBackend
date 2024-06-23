@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import (
+    BigInteger,
     Boolean,
     Column,
     DateTime,
@@ -13,13 +14,13 @@ from sqlalchemy import (
     String,
     Table,
     insert,
-    select, BigInteger,
+    select,
 )
 from sqlalchemy.dialects.postgresql import UUID
 
-from ..app.core.timezone import UTC_PLUS_3
 from ..app.core.config import settings
 from ..app.core.db.database import AsyncSession, async_engine, local_session
+from ..app.core.timezone import UTC_PLUS_3
 from ..app.models.agent import Agent
 
 logging.basicConfig(level=logging.INFO)
@@ -102,7 +103,9 @@ async def main():
                 await create_first_user(session)
                 break  # Если выполнение успешно, выйти из цикла
             except Exception as e:
-                logger.error(f"Attempt {attempt + 1}/{retry_attempts} - Error creating admin agent: {e}")
+                logger.error(
+                    f"Attempt {attempt + 1}/{retry_attempts} - Error creating admin agent: {e}"
+                )
                 if attempt < retry_attempts - 1:
                     await asyncio.sleep(4)  # Задержка перед повторной попыткой
                 else:

@@ -12,8 +12,8 @@ from ...core.db.database import async_get_db
 from ...crud.crud_customer import crud_customers
 from ...crud.crud_review import crud_reviews
 from ...models.customer import Customer
-from ...schemas.customer import CustomerCreateInternal, CustomerRead, CustomerIdUsername
-from ...schemas.review import ReviewCreate, ReviewCreateInternal, ReviewRead, ReviewGet
+from ...schemas.customer import CustomerCreateInternal, CustomerIdUsername, CustomerRead
+from ...schemas.review import ReviewCreate, ReviewCreateInternal, ReviewGet, ReviewRead
 from ..dependencies import get_current_superagent
 
 router = APIRouter(tags=["review"])
@@ -21,21 +21,22 @@ router = APIRouter(tags=["review"])
 
 @router.get("/reviews", response_class=StreamingResponse)
 async def get_all_reviews(
-        request: Request, db: Annotated[AsyncSession, Depends(async_get_db)]
+    request: Request, db: Annotated[AsyncSession, Depends(async_get_db)]
 ):
     reviews_data = await crud_reviews.get_multi_joined(
-        db, join_model=Customer,
+        db,
+        join_model=Customer,
         schema_to_select=ReviewGet,
         join_schema_to_select=CustomerIdUsername,
-        join_type='left',
-        sort_columns='created_at',
-        sort_orders='asc'
+        join_type="left",
+        sort_columns="created_at",
+        sort_orders="asc",
     )
 
     # Конвертация данных в DataFrame
     df = pd.DataFrame([review for review in reviews_data["data"]])
 
-    if reviews_data['total_count'] > 0:
+    if reviews_data["total_count"] > 0:
         df.drop(columns=["id"], inplace=True)
 
         # Set the desired order of columns
@@ -65,10 +66,10 @@ async def get_all_reviews(
 
 @router.post("/review", response_model=ReviewRead, status_code=201)
 async def write_review(
-        request: Request,
-        review: ReviewCreate,
-        customer_telegram_username: str,
-        db: Annotated[AsyncSession, Depends(async_get_db)],
+    request: Request,
+    review: ReviewCreate,
+    customer_telegram_username: str,
+    db: Annotated[AsyncSession, Depends(async_get_db)],
 ) -> ReviewRead:
     customer_row = await crud_customers.exists(db=db, id=review.created_by_customer_id)
     if not customer_row:
@@ -90,7 +91,7 @@ async def write_review(
 
 @router.delete("/reviews")
 async def delete_db_all_reviews(
-        request: Request, self_agent_id: int, db: Annotated[AsyncSession, Depends(async_get_db)]
+    request: Request, self_agent_id: int, db: Annotated[AsyncSession, Depends(async_get_db)]
 ) -> dict[str, str]:
     # Проверка прав текущего пользователя
     await get_current_superagent(self_agent_id, db)

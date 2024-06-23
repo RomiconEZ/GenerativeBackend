@@ -3,8 +3,8 @@ from datetime import datetime
 from sqlalchemy import DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ..core.timezone import UTC_PLUS_3
 from ..core.db.database import Base
+from ..core.timezone import UTC_PLUS_3
 
 
 class Tier(Base):
