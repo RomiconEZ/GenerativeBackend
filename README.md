@@ -56,6 +56,30 @@
 
 Link to project in GitHub: https://github.com/RomiconEZ/GenerativeBackend
 
+#### = ENG =
+This Backend service is part of the contact center automation system for the tour business.
+
+He is the link between chatbots for clients and for agents.
+
+The main purpose of the Backend is to generate text and audio answers to user questions,
+as well as redirect users to agents.
+
+To respond to user requests, a locally deployed LLM is used:
+IlyaGusev/saiga_mistral_7b_gguf using LM studio and RAG.
+
+RAG: "intfloat/multilingual-e5-large-instruct" is used as the embedding model.
+Chroma is used to create and use a vector representation of text data.
+LangChain is used for processing and managing text data.
+The knowledge base contains a file with information about the tour operator (all matches are random).
+
+To provide asynchronous processing of heavy tasks (LLM request, sound generation)
+, the ARQ library (Asynchronous Redis Queue) is used, which uses Redis as a message broker
+to manage task queues. 
+
+Solving problems using the service takes place in 2 stages:
+1) Request to queue a task and get its id
+2) Requests for the status of the task with its id
+#### = RU =
 Данный Backend сервис является частью системы автоматизации контакт-центра для тур-бизнеса.
 
 Он является связующим звеном между чат-ботами для клиентов и для агентов.
@@ -133,8 +157,6 @@ This project is licensed under the terms of the Creative Commons Attribution-Non
 
 [![Creative Commons License](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png)](http://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-
-
 <!-- CONTACT -->
 ## Contact / Контакты
 
@@ -157,7 +179,7 @@ Roman Neronov:
 [issues-shield]: https://img.shields.io/github/issues/RomiconEZ/GenerativeBackend.svg?style=for-the-badge
 [issues-url]: https://github.com/RomiconEZ/GenerativeBackend/issues
 [license-shield]: https://img.shields.io/github/license/RomiconEZ/GenerativeBackend.svg?style=for-the-badge
-[license-url]: https://github.com/RomiconEZ/GenerativeBackend/blob/master/LICENSE.txt
+[license-url]: https://github.com/RomiconEZ/GenerativeBackend/blob/dev/LICENSE.txt
 [product-screenshot]: readme_images/backend_logo.png
 
 
