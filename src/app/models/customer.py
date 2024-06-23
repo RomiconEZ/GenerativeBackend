@@ -1,7 +1,7 @@
 import uuid as uuid_pkg
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, String
+from sqlalchemy import DateTime, ForeignKey, String, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column
 
 from ..core.timezone import UTC_PLUS_3
@@ -11,7 +11,7 @@ from ..core.db.database import Base
 class Customer(Base):
     __tablename__ = "customer"
 
-    id: Mapped[int] = mapped_column("id", nullable=False, unique=True, primary_key=True)
+    id: Mapped[int] = mapped_column("id", BigInteger, nullable=False, unique=True, primary_key=True)
 
     name: Mapped[str] = mapped_column(String(30), nullable=True)
     surname: Mapped[str] = mapped_column(String(50), nullable=True)

@@ -1,7 +1,7 @@
 import uuid as uuid_pkg
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, String
+from sqlalchemy import DateTime, ForeignKey, String, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column
 
 from ..core.timezone import UTC_PLUS_3
@@ -11,7 +11,7 @@ from ..core.db.database import Base
 class Agent(Base):
     __tablename__ = "agent"
 
-    id: Mapped[int] = mapped_column("id", unique=True, primary_key=True, nullable=False)
+    id: Mapped[int] = mapped_column("id", BigInteger, unique=True, primary_key=True, nullable=False)
 
     name: Mapped[str] = mapped_column(String(30), nullable=True)
     surname: Mapped[str] = mapped_column(String(50), nullable=True)

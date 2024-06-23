@@ -1,7 +1,7 @@
 import uuid as uuid_pkg
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, String
+from sqlalchemy import DateTime, ForeignKey, String, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column
 
 from ..core.timezone import UTC_PLUS_3
@@ -11,14 +11,14 @@ from ..core.db.database import Base
 class WaitingCustomers(Base):
     __tablename__ = "waiting_customers"
     id: Mapped[int] = mapped_column(
-        "id", autoincrement=True, nullable=False, unique=True, primary_key=True, init=False
+        "id", BigInteger, autoincrement=True, nullable=False, unique=True, primary_key=True, init=False
     )
 
     agent_id: Mapped[int | None] = mapped_column(
-        ForeignKey("agent.id"), nullable=True, init=True
+        BigInteger, ForeignKey("agent.id"), nullable=True, init=True
     )
     customer_id: Mapped[int] = mapped_column(
-        ForeignKey("customer.id"), nullable=False, unique=True, init=True
+        BigInteger, ForeignKey("customer.id"), nullable=False, unique=True, init=True
     )
 
     problem_summary: Mapped[str] = mapped_column(String(63206), nullable=True)

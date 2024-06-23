@@ -13,7 +13,7 @@ from sqlalchemy import (
     String,
     Table,
     insert,
-    select,
+    select, BigInteger,
 )
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -43,7 +43,7 @@ async def create_first_user(session: AsyncSession) -> None:
             user_table = Table(
                 "agent",
                 metadata,
-                Column("id", Integer, primary_key=True, nullable=False),
+                Column("id", BigInteger, primary_key=True, nullable=False),
                 Column("name", String(30), nullable=False),
                 Column("surname", String(50), nullable=False),
                 Column("patronymic", String(40), nullable=False),
